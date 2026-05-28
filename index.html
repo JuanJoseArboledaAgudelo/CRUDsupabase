@@ -46,12 +46,16 @@
 
 <script>
 
+console.log('Iniciando aplicación...');
+
 const supabaseUrl = 'https://fovpklepwacddtmzamjd.supabase.co';
 const supabaseKey = 'sb_publishable_fYJYrBwRxB24GB1lHxrs-Q_9r5N8jHF';
 //sb_publishable_fYJYrBwRxB24GB1lHxrs-Q_9r5N8jHF
 // Create Supabase client (support both v2 CDN which exposes createClient at window.createClient
 // and older exposures at window.supabase.createClient)
-const supabaseClient = (window.createClient || (window.supabase && window.supabase.createClient)).call(window, supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+
 
 // Quick connectivity check
 async function checkConnection() {
@@ -84,42 +88,43 @@ function validateFields(nombre, correo) {
 }
 
 function clearFields() {
+    document.getElementById('userId').value = '';
     document.getElementById('nombre').value = '';
     document.getElementById('correo').value = '';
-    document.getElementById('userId').value = '';
+
 }
 
-function saveUser() {
-    const nombre = document.getElementById('nombre').value;
-    const correo = document.getElementById('correo').value;
-    const userId = document.getElementById('userId').value;
+async function saveUser() {
+try{
+        const nombre = document.getElementById('nombre').value;
+        const correo = document.getElementById('correo').value.trim();
+        const userId = document.getElementById('userId').value.trim();
 
-    if (!validateFields(nombre, correo)) {
-        return;
-    }
-    let error;
+        if (!validateFields(nombre, correo)) {
+            return;
+        }
+        let error;
 
     
         // Actualizar usuario existente
 
-    (async () => {
-        try {
-            if (userId) {
-                const { data, error } = await supabaseClient.from('users').update({ nombre, correo }).eq('id', userId);
-                if (error) throw error;
-                alert('Usuario actualizado correctamente');
-            } else {
-                const { data, error } = await supabaseClient.from('users').insert({ nombre, correo });
-                if (error) throw error;
-                alert('Usuario creado correctamente');
+        if (userId) {
+            (error = await supabaseClient.from('users').update({ nombre, correo }).eq('id', userId))
+        } else {
+                //insert
+            ({error}= await supabaseClient.from('users').insert([{ nombre: nombre, correo: correo }
+          ]));
+        }
+            if (error){ 
+                throw error;
             }
+            alert('Usuario actualizado correctamente');
             clearFields();
             cargarUsuarios();
-        } catch (err) {
-            console.error('Error al guardar usuario:', err.message || err);
-            alert('Error al guardar usuario: ' + (err.message || err));
-        }
-    })();
+        }catch (err) {
+            console.error(err);
+            alert('Error al guardar usuario: ' + err.message);
+    }
 }
 
 // Editar y eliminar auxiliares
@@ -168,7 +173,7 @@ async function cargarUsuarios() {
             <td>${usuario.nombre}</td>
             <td>${usuario.correo}</td>
             <td>
-              <button class="btn btn-warning btn-sm me-1" onclick="editarUsuario(${usuario.id}, '${usuario.nombre}', '${usuario.correo}')">Editar</button>
+              <button class="btn btn-warning btn-sm me-1" onclick="editarUsuario(${usuario.id}, \'${usuario.nombre}\', \'${usuario.correo}\')">Editar</button>
               <button class="btn btn-danger btn-sm" onclick="eliminarUsuario(${usuario.id})">Eliminar</button>
             </td>
           </tr>
