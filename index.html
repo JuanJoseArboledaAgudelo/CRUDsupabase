@@ -21,18 +21,17 @@
             <input type="hidden" id="userId">
 
             <input type="text" id="nombre" class="form-control mb-2" placeholder="Nombre">
-            <input type="email" id="correo" class="form-control mb-2" placeholder="Correo electrónico">
+            <input type="email" id="correo" class="form-control mb-3" placeholder="Correo electrónico">
 
-            <button id="saveBtn" class="btn btn-primary w-100 mb-2">Guardar</button>
-            <button id="deleteBtn" class="btn btn-danger w-100">Eliminar</button>
+            <button class="btn btn-primary w-100 mb-2" onclick="saveUser()">Guardar</button>
         </div>
 
         <div class="card p-3">
             <h4>Lista de Usuarios</h4>
         </div>
 
-        <table class="table mt-4">
-            <thead>
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
                 <tr>
                     <th>ID</th>
                     <th>Nombre</th>
